@@ -4,9 +4,9 @@
   "description": "TypeScript + Express scaffold",
   "main": "dist/server.js",
   "scripts": {
-    "dev": "tsx watch src/server.ts",
-    "test": "vitest run",
-    "build": "tsc"
+    "dev": "exec tsx watch src/server.ts",
+    "test": "exec vitest run",
+    "build": "exec tsc"
   },
   "dependencies": {
     "express": "^4.18.2"
