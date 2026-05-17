@@ -6,6 +6,10 @@ app.get("/", (_req, res) => {
   res.json({ status: "ok" });
 });
 
+app.get("/health", (_req, res) => {
+  res.json({ ok: true, ts: new Date().toISOString() });
+});
+
 // Only start listening when run directly (not when imported by tests)
 if (require.main === module) {
   const port = process.env.PORT || 3000;
