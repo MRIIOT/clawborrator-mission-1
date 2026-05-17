@@ -92,3 +92,57 @@ describe("GET /add", () => {
     expect(res.body.sum).toBe(0);
   });
 });
+
+describe("GET /multiply", () => {
+  it("happy path: a=6&b=7 -> 200 with product=42", async () => {
+    const res = await request(app).get("/multiply?a=6&b=7");
+    expect(res.status).toBe(200);
+    expect(res.body.product).toBe(42);
+  });
+
+  it("decimals: a=2.5&b=4 -> 200 with product=10", async () => {
+    const res = await request(app).get("/multiply?a=2.5&b=4");
+    expect(res.status).toBe(200);
+    expect(res.body.product).toBe(10);
+  });
+
+  it("negative numbers: a=-3&b=4 -> 200 with product=-12", async () => {
+    const res = await request(app).get("/multiply?a=-3&b=4");
+    expect(res.status).toBe(200);
+    expect(res.body.product).toBe(-12);
+  });
+
+  it("zero: a=0&b=99 -> 200 with product=0", async () => {
+    const res = await request(app).get("/multiply?a=0&b=99");
+    expect(res.status).toBe(200);
+    expect(res.body.product).toBe(0);
+  });
+
+  it("missing b param: returns 400 with error", async () => {
+    const res = await request(app).get("/multiply?a=3");
+    expect(res.status).toBe(400);
+    expect(typeof res.body.error).toBe("string");
+    expect(res.body.error.length).toBeGreaterThan(0);
+  });
+
+  it("missing a param: returns 400 with error", async () => {
+    const res = await request(app).get("/multiply?b=3");
+    expect(res.status).toBe(400);
+    expect(typeof res.body.error).toBe("string");
+    expect(res.body.error.length).toBeGreaterThan(0);
+  });
+
+  it("non-numeric a param (foo): returns 400 with error", async () => {
+    const res = await request(app).get("/multiply?a=foo&b=3");
+    expect(res.status).toBe(400);
+    expect(typeof res.body.error).toBe("string");
+    expect(res.body.error.length).toBeGreaterThan(0);
+  });
+
+  it("non-numeric b param (5x): returns 400 with error", async () => {
+    const res = await request(app).get("/multiply?a=2&b=5x");
+    expect(res.status).toBe(400);
+    expect(typeof res.body.error).toBe("string");
+    expect(res.body.error.length).toBeGreaterThan(0);
+  });
+});
