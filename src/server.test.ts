@@ -38,3 +38,57 @@ describe("GET /health", () => {
     expect(res.headers["content-type"]).toMatch(/application\/json/);
   });
 });
+
+describe("GET /add", () => {
+  it("happy path: returns 200 with correct sum", async () => {
+    const res = await request(app).get("/add?a=2&b=3");
+    expect(res.status).toBe(200);
+    expect(res.body.sum).toBe(5);
+  });
+
+  it("missing b param: returns 400 with error", async () => {
+    const res = await request(app).get("/add?a=2");
+    expect(res.status).toBe(400);
+    expect(typeof res.body.error).toBe("string");
+    expect(res.body.error.length).toBeGreaterThan(0);
+  });
+
+  it("missing a param: returns 400 with error", async () => {
+    const res = await request(app).get("/add?b=3");
+    expect(res.status).toBe(400);
+    expect(typeof res.body.error).toBe("string");
+    expect(res.body.error.length).toBeGreaterThan(0);
+  });
+
+  it("non-numeric a param: returns 400 with error", async () => {
+    const res = await request(app).get("/add?a=foo&b=3");
+    expect(res.status).toBe(400);
+    expect(typeof res.body.error).toBe("string");
+    expect(res.body.error.length).toBeGreaterThan(0);
+  });
+
+  it("non-numeric b param (e.g. 5x): returns 400 with error", async () => {
+    const res = await request(app).get("/add?a=2&b=5x");
+    expect(res.status).toBe(400);
+    expect(typeof res.body.error).toBe("string");
+    expect(res.body.error.length).toBeGreaterThan(0);
+  });
+
+  it("large integers: a=2147483647&b=2147483647 -> sum=4294967294", async () => {
+    const res = await request(app).get("/add?a=2147483647&b=2147483647");
+    expect(res.status).toBe(200);
+    expect(res.body.sum).toBe(4294967294);
+  });
+
+  it("negative numbers: a=-5&b=10 -> sum=5", async () => {
+    const res = await request(app).get("/add?a=-5&b=10");
+    expect(res.status).toBe(200);
+    expect(res.body.sum).toBe(5);
+  });
+
+  it("zero values: a=0&b=0 -> sum=0", async () => {
+    const res = await request(app).get("/add?a=0&b=0");
+    expect(res.status).toBe(200);
+    expect(res.body.sum).toBe(0);
+  });
+});
